@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task';
+import { Task as TaskService, TaskDto } from '../../services/task';
 
 @Component({
   imports: [CommonModule, FormsModule],
@@ -13,7 +13,7 @@ import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task
           <h1>Tasks</h1>
           <p class="subtitle">Track and manage research tasks</p>
         </div>
-        <button (click)="showForm.set(true)" class="btn-primary">
+        <button (click)="showForm.set(true); editingId.set(null); formTitle=''; formDescription=''; formPriority='Medium'" class="btn-primary">
           <span class="material-icons">add</span>
           New Task
         </button>
@@ -21,18 +21,16 @@ import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task
 
       @if (showForm()) {
         <div class="card form-card">
-          <div class="card-header">
-            <h3>{{ editingId() ? 'Edit' : 'Create' }} Task</h3>
-          </div>
+          <div class="card-header"><h3>Create Task</h3></div>
           <form (ngSubmit)="onSubmit()" class="card-body">
             <div class="form-grid">
               <div class="form-group">
                 <label>Title</label>
-                <input type="text" [(ngModel)]="form.title" name="title" required placeholder="Task title" />
+                <input type="text" [(ngModel)]="formTitle" name="title" required placeholder="Task title" />
               </div>
               <div class="form-group">
                 <label>Priority</label>
-                <select [(ngModel)]="form.priority" name="priority">
+                <select [(ngModel)]="formPriority" name="priority">
                   <option value="Low">Low</option>
                   <option value="Medium">Medium</option>
                   <option value="High">High</option>
@@ -41,14 +39,11 @@ import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task
               </div>
               <div class="form-group form-full">
                 <label>Description</label>
-                <textarea [(ngModel)]="form.description" name="description" required rows="3" placeholder="Describe the task"></textarea>
+                <textarea [(ngModel)]="formDescription" name="description" required rows="3" placeholder="Describe the task"></textarea>
               </div>
             </div>
             <div class="form-actions">
-              <button type="submit" class="btn-primary">
-                <span class="material-icons">save</span>
-                {{ editingId() ? 'Update' : 'Create' }}
-              </button>
+              <button type="submit" class="btn-primary"><span class="material-icons">save</span> Create</button>
               <button type="button" (click)="cancelForm()" class="btn-secondary">Cancel</button>
             </div>
           </form>
@@ -58,12 +53,7 @@ import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task
       <div class="card">
         <table>
           <thead>
-            <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th style="width: 200px;">Actions</th>
-            </tr>
+            <tr><th>Title</th><th>Status</th><th>Priority</th><th style="width: 200px;">Actions</th></tr>
           </thead>
           <tbody>
             @for (task of tasks(); track task.id) {
@@ -73,9 +63,6 @@ import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task
                 <td><span class="priority" [attr.data-priority]="task.priority">{{ task.priority }}</span></td>
                 <td>
                   <div class="action-buttons">
-                    <button (click)="edit(task)" class="btn-icon" title="Edit">
-                      <span class="material-icons">edit</span>
-                    </button>
                     @if (task.status === 'ToDo') {
                       <button (click)="start(task.id)" class="btn-sm btn-primary">Start</button>
                     }
@@ -83,9 +70,7 @@ import { Task as TaskService, TaskDto, CreateTaskDto } from '../../services/task
                       <button (click)="complete(task.id)" class="btn-sm btn-success">Complete</button>
                       <button (click)="cancel(task.id)" class="btn-sm btn-danger">Cancel</button>
                     }
-                    <button (click)="delete(task.id)" class="btn-icon btn-danger" title="Delete">
-                      <span class="material-icons">delete</span>
-                    </button>
+                    <button (click)="delete(task.id)" class="btn-icon btn-danger" title="Delete"><span class="material-icons">delete</span></button>
                   </div>
                 </td>
               </tr>
@@ -144,7 +129,9 @@ export class Tasks implements OnInit {
   tasks = signal<TaskDto[]>([]);
   showForm = signal(false);
   editingId = signal<string | null>(null);
-  form: CreateTaskDto = { title: '', description: '', assignedTo: '00000000-0000-0000-0000-000000000000', priority: 'Medium' };
+  formTitle = '';
+  formDescription = '';
+  formPriority = 'Medium';
 
   constructor(private taskService: TaskService) {}
 
@@ -153,13 +140,10 @@ export class Tasks implements OnInit {
   load() { this.taskService.getAll().subscribe(data => this.tasks.set(data)); }
 
   onSubmit() {
-    this.taskService.create(this.form).subscribe(() => { this.cancelForm(); this.load(); });
-  }
-
-  edit(task: TaskDto) {
-    this.editingId.set(task.id);
-    this.form = { title: task.title, description: task.description, assignedTo: task.assignedTo, priority: task.priority };
-    this.showForm.set(true);
+    this.taskService.create({
+      title: this.formTitle, description: this.formDescription,
+      assignedTo: '00000000-0000-0000-0000-000000000000', priority: this.formPriority
+    }).subscribe(() => { this.cancelForm(); this.load(); });
   }
 
   start(id: string) { this.taskService.start(id).subscribe(() => this.load()); }
@@ -167,9 +151,5 @@ export class Tasks implements OnInit {
   cancel(id: string) { this.taskService.cancel(id).subscribe(() => this.load()); }
   delete(id: string) { this.taskService.delete(id).subscribe(() => this.load()); }
 
-  cancelForm() {
-    this.showForm.set(false);
-    this.editingId.set(null);
-    this.form = { title: '', description: '', assignedTo: '00000000-0000-0000-0000-000000000000', priority: 'Medium' };
-  }
+  cancelForm() { this.showForm.set(false); this.editingId.set(null); this.formTitle = ''; this.formDescription = ''; this.formPriority = 'Medium'; }
 }

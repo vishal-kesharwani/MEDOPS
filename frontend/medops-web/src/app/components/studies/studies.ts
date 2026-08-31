@@ -28,11 +28,11 @@ import { Study, StudyDto, CreateStudyDto } from '../../services/study';
             <div class="form-grid">
               <div class="form-group">
                 <label>Name</label>
-                <input type="text" [(ngModel)]="form.name" name="name" required placeholder="Enter study name" />
+                <input type="text" [(ngModel)]="formName" name="name" required placeholder="Enter study name" />
               </div>
               <div class="form-group form-full">
                 <label>Description</label>
-                <textarea [(ngModel)]="form.description" name="description" required rows="3" placeholder="Describe the study"></textarea>
+                <textarea [(ngModel)]="formDescription" name="description" required rows="3" placeholder="Describe the study"></textarea>
               </div>
             </div>
             <div class="form-actions">
@@ -193,7 +193,8 @@ export class Studies implements OnInit {
   studies = signal<StudyDto[]>([]);
   showForm = signal(false);
   editingId = signal<string | null>(null);
-  form: CreateStudyDto = { name: '', description: '' };
+  formName = '';
+  formDescription = '';
 
   constructor(private studyService: Study) {}
 
@@ -202,20 +203,22 @@ export class Studies implements OnInit {
   load() { this.studyService.getAll().subscribe(data => this.studies.set(data)); }
 
   onSubmit() {
+    const dto = { name: this.formName, description: this.formDescription };
     if (this.editingId()) {
-      this.studyService.update(this.editingId()!, this.form).subscribe(() => { this.cancelForm(); this.load(); });
+      this.studyService.update(this.editingId()!, dto).subscribe(() => { this.cancelForm(); this.load(); });
     } else {
-      this.studyService.create(this.form).subscribe(() => { this.cancelForm(); this.load(); });
+      this.studyService.create(dto).subscribe(() => { this.cancelForm(); this.load(); });
     }
   }
 
   edit(study: StudyDto) {
     this.editingId.set(study.id);
-    this.form = { name: study.name, description: study.description };
+    this.formName = study.name;
+    this.formDescription = study.description;
     this.showForm.set(true);
   }
 
   delete(id: string) { this.studyService.delete(id).subscribe(() => this.load()); }
 
-  cancelForm() { this.showForm.set(false); this.editingId.set(null); this.form = { name: '', description: '' }; }
+  cancelForm() { this.showForm.set(false); this.editingId.set(null); this.formName = ''; this.formDescription = ''; }
 }

@@ -13,7 +13,7 @@ import { Department as DepartmentService, DepartmentDto, CreateDepartmentDto } f
           <h1>Departments</h1>
           <p class="subtitle">Manage organizational departments</p>
         </div>
-        <button (click)="showForm.set(true)" class="btn-primary">
+        <button (click)="showForm.set(true); editingId.set(null); formName=''; formDescription=''" class="btn-primary">
           <span class="material-icons">add</span>
           New Department
         </button>
@@ -21,18 +21,16 @@ import { Department as DepartmentService, DepartmentDto, CreateDepartmentDto } f
 
       @if (showForm()) {
         <div class="card form-card">
-          <div class="card-header">
-            <h3>{{ editingId() ? 'Edit' : 'Create' }} Department</h3>
-          </div>
+          <div class="card-header"><h3>{{ editingId() ? 'Edit' : 'Create' }} Department</h3></div>
           <form (ngSubmit)="onSubmit()" class="card-body">
             <div class="form-grid">
               <div class="form-group">
                 <label>Name</label>
-                <input type="text" [(ngModel)]="form.name" name="name" required placeholder="Department name" />
+                <input type="text" [(ngModel)]="formName" name="name" required placeholder="Department name" />
               </div>
               <div class="form-group">
                 <label>Description</label>
-                <input type="text" [(ngModel)]="form.description" name="description" required placeholder="Brief description" />
+                <input type="text" [(ngModel)]="formDescription" name="description" required placeholder="Brief description" />
               </div>
             </div>
             <div class="form-actions">
@@ -49,11 +47,7 @@ import { Department as DepartmentService, DepartmentDto, CreateDepartmentDto } f
       <div class="card">
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th style="width: 100px;">Actions</th>
-            </tr>
+            <tr><th>Name</th><th>Description</th><th style="width: 100px;">Actions</th></tr>
           </thead>
           <tbody>
             @for (dept of departments(); track dept.id) {
@@ -62,12 +56,8 @@ import { Department as DepartmentService, DepartmentDto, CreateDepartmentDto } f
                 <td class="cell-muted">{{ dept.description }}</td>
                 <td>
                   <div class="action-buttons">
-                    <button (click)="edit(dept)" class="btn-icon" title="Edit">
-                      <span class="material-icons">edit</span>
-                    </button>
-                    <button (click)="delete(dept.id)" class="btn-icon btn-danger" title="Delete">
-                      <span class="material-icons">delete</span>
-                    </button>
+                    <button (click)="edit(dept)" class="btn-icon" title="Edit"><span class="material-icons">edit</span></button>
+                    <button (click)="delete(dept.id)" class="btn-icon btn-danger" title="Delete"><span class="material-icons">delete</span></button>
                   </div>
                 </td>
               </tr>
@@ -111,7 +101,8 @@ export class Departments implements OnInit {
   departments = signal<DepartmentDto[]>([]);
   showForm = signal(false);
   editingId = signal<string | null>(null);
-  form: CreateDepartmentDto = { name: '', description: '' };
+  formName = '';
+  formDescription = '';
 
   constructor(private departmentService: DepartmentService) {}
 
@@ -120,24 +111,22 @@ export class Departments implements OnInit {
   load() { this.departmentService.getAll().subscribe(data => this.departments.set(data)); }
 
   onSubmit() {
+    const dto: CreateDepartmentDto = { name: this.formName, description: this.formDescription };
     if (this.editingId()) {
-      this.departmentService.update(this.editingId()!, this.form).subscribe(() => { this.cancelForm(); this.load(); });
+      this.departmentService.update(this.editingId()!, dto).subscribe(() => { this.cancelForm(); this.load(); });
     } else {
-      this.departmentService.create(this.form).subscribe(() => { this.cancelForm(); this.load(); });
+      this.departmentService.create(dto).subscribe(() => { this.cancelForm(); this.load(); });
     }
   }
 
   edit(dept: DepartmentDto) {
     this.editingId.set(dept.id);
-    this.form = { name: dept.name, description: dept.description };
+    this.formName = dept.name;
+    this.formDescription = dept.description;
     this.showForm.set(true);
   }
 
   delete(id: string) { this.departmentService.delete(id).subscribe(() => this.load()); }
 
-  cancelForm() {
-    this.showForm.set(false);
-    this.editingId.set(null);
-    this.form = { name: '', description: '' };
-  }
+  cancelForm() { this.showForm.set(false); this.editingId.set(null); this.formName = ''; this.formDescription = ''; }
 }

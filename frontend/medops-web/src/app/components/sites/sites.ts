@@ -21,46 +21,44 @@ import { Site, SiteDto, CreateSiteDto } from '../../services/site';
 
       @if (showForm()) {
         <div class="card form-card">
-          <div class="card-header">
-            <h3>{{ editingId() ? 'Edit' : 'Create' }} Site</h3>
-          </div>
+          <div class="card-header"><h3>{{ editingId() ? 'Edit' : 'Create' }} Site</h3></div>
           <form (ngSubmit)="onSubmit()" class="card-body">
             <div class="form-grid">
               <div class="form-group">
                 <label>Name</label>
-                <input type="text" [(ngModel)]="form.name" name="name" required placeholder="Site name" />
+                <input type="text" [(ngModel)]="formName" name="name" required placeholder="Site name" />
               </div>
               <div class="form-group">
                 <label>Description</label>
-                <input type="text" [(ngModel)]="form.description" name="description" required placeholder="Brief description" />
+                <input type="text" [(ngModel)]="formDescription" name="description" required placeholder="Brief description" />
               </div>
               <div class="form-group">
                 <label>Street</label>
-                <input type="text" [(ngModel)]="form.address.street" name="street" placeholder="Street address" />
+                <input type="text" [(ngModel)]="formStreet" name="street" placeholder="Street address" />
               </div>
               <div class="form-group">
                 <label>City</label>
-                <input type="text" [(ngModel)]="form.address.city" name="city" placeholder="City" />
+                <input type="text" [(ngModel)]="formCity" name="city" placeholder="City" />
               </div>
               <div class="form-group">
                 <label>State</label>
-                <input type="text" [(ngModel)]="form.address.state" name="state" placeholder="State" />
+                <input type="text" [(ngModel)]="formState" name="state" placeholder="State" />
               </div>
               <div class="form-group">
                 <label>Country</label>
-                <input type="text" [(ngModel)]="form.address.country" name="country" placeholder="Country" />
+                <input type="text" [(ngModel)]="formCountry" name="country" placeholder="Country" />
               </div>
               <div class="form-group">
                 <label>Zip Code</label>
-                <input type="text" [(ngModel)]="form.address.zipCode" name="zipCode" placeholder="Zip code" />
+                <input type="text" [(ngModel)]="formZipCode" name="zipCode" placeholder="Zip code" />
               </div>
               <div class="form-group">
                 <label>Contact Email</label>
-                <input type="email" [(ngModel)]="form.contactInfo.email" name="contactEmail" placeholder="email&#64;example.com" />
+                <input type="email" [(ngModel)]="formContactEmail" name="contactEmail" placeholder="email&#64;example.com" />
               </div>
               <div class="form-group">
                 <label>Contact Phone</label>
-                <input type="tel" [(ngModel)]="form.contactInfo.phone" name="contactPhone" placeholder="+1 555-0100" />
+                <input type="tel" [(ngModel)]="formContactPhone" name="contactPhone" placeholder="+1 555-0100" />
               </div>
             </div>
             <div class="form-actions">
@@ -77,12 +75,7 @@ import { Site, SiteDto, CreateSiteDto } from '../../services/site';
       <div class="card">
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>Status</th>
-              <th>City</th>
-              <th style="width: 180px;">Actions</th>
-            </tr>
+            <tr><th>Name</th><th>Status</th><th>City</th><th style="width: 180px;">Actions</th></tr>
           </thead>
           <tbody>
             @for (site of sites(); track site.id) {
@@ -92,17 +85,13 @@ import { Site, SiteDto, CreateSiteDto } from '../../services/site';
                 <td class="cell-muted">{{ site.address?.city || '—' }}</td>
                 <td>
                   <div class="action-buttons">
-                    <button (click)="edit(site)" class="btn-icon" title="Edit">
-                      <span class="material-icons">edit</span>
-                    </button>
+                    <button (click)="edit(site)" class="btn-icon" title="Edit"><span class="material-icons">edit</span></button>
                     @if (site.status === 'Active') {
                       <button (click)="deactivate(site.id)" class="btn-sm btn-warning">Deactivate</button>
                     } @else {
                       <button (click)="activate(site.id)" class="btn-sm btn-success">Activate</button>
                     }
-                    <button (click)="delete(site.id)" class="btn-icon btn-danger" title="Delete">
-                      <span class="material-icons">delete</span>
-                    </button>
+                    <button (click)="delete(site.id)" class="btn-icon btn-danger" title="Delete"><span class="material-icons">delete</span></button>
                   </div>
                 </td>
               </tr>
@@ -154,11 +143,15 @@ export class Sites implements OnInit {
   sites = signal<SiteDto[]>([]);
   showForm = signal(false);
   editingId = signal<string | null>(null);
-  form: CreateSiteDto = {
-    name: '', description: '',
-    address: { street: '', city: '', state: '', country: '', zipCode: '' },
-    contactInfo: { email: '', phone: '' }
-  };
+  formName = '';
+  formDescription = '';
+  formStreet = '';
+  formCity = '';
+  formState = '';
+  formCountry = '';
+  formZipCode = '';
+  formContactEmail = '';
+  formContactPhone = '';
 
   constructor(private siteService: Site) {}
 
@@ -167,20 +160,29 @@ export class Sites implements OnInit {
   load() { this.siteService.getAll().subscribe(data => this.sites.set(data)); }
 
   onSubmit() {
+    const dto: CreateSiteDto = {
+      name: this.formName, description: this.formDescription,
+      address: { street: this.formStreet, city: this.formCity, state: this.formState, country: this.formCountry, zipCode: this.formZipCode },
+      contactInfo: { email: this.formContactEmail, phone: this.formContactPhone }
+    };
     if (this.editingId()) {
-      this.siteService.update(this.editingId()!, this.form).subscribe(() => { this.cancelForm(); this.load(); });
+      this.siteService.update(this.editingId()!, dto).subscribe(() => { this.cancelForm(); this.load(); });
     } else {
-      this.siteService.create(this.form).subscribe(() => { this.cancelForm(); this.load(); });
+      this.siteService.create(dto).subscribe(() => { this.cancelForm(); this.load(); });
     }
   }
 
   edit(site: SiteDto) {
     this.editingId.set(site.id);
-    this.form = {
-      name: site.name, description: site.description,
-      address: { ...site.address },
-      contactInfo: { ...site.contactInfo }
-    };
+    this.formName = site.name;
+    this.formDescription = site.description;
+    this.formStreet = site.address?.street || '';
+    this.formCity = site.address?.city || '';
+    this.formState = site.address?.state || '';
+    this.formCountry = site.address?.country || '';
+    this.formZipCode = site.address?.zipCode || '';
+    this.formContactEmail = site.contactInfo?.email || '';
+    this.formContactPhone = site.contactInfo?.phone || '';
     this.showForm.set(true);
   }
 
@@ -189,12 +191,9 @@ export class Sites implements OnInit {
   delete(id: string) { this.siteService.delete(id).subscribe(() => this.load()); }
 
   cancelForm() {
-    this.showForm.set(false);
-    this.editingId.set(null);
-    this.form = {
-      name: '', description: '',
-      address: { street: '', city: '', state: '', country: '', zipCode: '' },
-      contactInfo: { email: '', phone: '' }
-    };
+    this.showForm.set(false); this.editingId.set(null);
+    this.formName = ''; this.formDescription = '';
+    this.formStreet = ''; this.formCity = ''; this.formState = ''; this.formCountry = ''; this.formZipCode = '';
+    this.formContactEmail = ''; this.formContactPhone = '';
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Request as RequestService, RequestDto, CreateRequestDto } from '../../services/request';
+import { Request as RequestService, RequestDto } from '../../services/request';
 
 @Component({
   imports: [CommonModule, FormsModule],
@@ -13,7 +13,7 @@ import { Request as RequestService, RequestDto, CreateRequestDto } from '../../s
           <h1>Requests</h1>
           <p class="subtitle">Review and manage approval requests</p>
         </div>
-        <button (click)="showForm.set(true)" class="btn-primary">
+        <button (click)="showForm.set(true); formTitle=''; formDescription=''; formPriority='Medium'" class="btn-primary">
           <span class="material-icons">add</span>
           New Request
         </button>
@@ -21,18 +21,16 @@ import { Request as RequestService, RequestDto, CreateRequestDto } from '../../s
 
       @if (showForm()) {
         <div class="card form-card">
-          <div class="card-header">
-            <h3>Create Request</h3>
-          </div>
+          <div class="card-header"><h3>Create Request</h3></div>
           <form (ngSubmit)="onSubmit()" class="card-body">
             <div class="form-grid">
               <div class="form-group">
                 <label>Title</label>
-                <input type="text" [(ngModel)]="form.title" name="title" required placeholder="Request title" />
+                <input type="text" [(ngModel)]="formTitle" name="title" required placeholder="Request title" />
               </div>
               <div class="form-group">
                 <label>Priority</label>
-                <select [(ngModel)]="form.priority" name="priority">
+                <select [(ngModel)]="formPriority" name="priority">
                   <option value="Low">Low</option>
                   <option value="Medium">Medium</option>
                   <option value="High">High</option>
@@ -40,14 +38,11 @@ import { Request as RequestService, RequestDto, CreateRequestDto } from '../../s
               </div>
               <div class="form-group form-full">
                 <label>Description</label>
-                <textarea [(ngModel)]="form.description" name="description" required rows="3" placeholder="Describe the request"></textarea>
+                <textarea [(ngModel)]="formDescription" name="description" required rows="3" placeholder="Describe the request"></textarea>
               </div>
             </div>
             <div class="form-actions">
-              <button type="submit" class="btn-primary">
-                <span class="material-icons">send</span>
-                Submit Request
-              </button>
+              <button type="submit" class="btn-primary"><span class="material-icons">send</span> Submit Request</button>
               <button type="button" (click)="cancelForm()" class="btn-secondary">Cancel</button>
             </div>
           </form>
@@ -57,13 +52,7 @@ import { Request as RequestService, RequestDto, CreateRequestDto } from '../../s
       <div class="card">
         <table>
           <thead>
-            <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Created</th>
-              <th style="width: 200px;">Actions</th>
-            </tr>
+            <tr><th>Title</th><th>Status</th><th>Priority</th><th>Created</th><th style="width: 200px;">Actions</th></tr>
           </thead>
           <tbody>
             @for (req of requests(); track req.id) {
@@ -131,7 +120,9 @@ import { Request as RequestService, RequestDto, CreateRequestDto } from '../../s
 export class Requests implements OnInit {
   requests = signal<RequestDto[]>([]);
   showForm = signal(false);
-  form: CreateRequestDto = { title: '', description: '', priority: 'Medium' };
+  formTitle = '';
+  formDescription = '';
+  formPriority = 'Medium';
 
   constructor(private requestService: RequestService) {}
 
@@ -140,14 +131,13 @@ export class Requests implements OnInit {
   load() { this.requestService.getAll().subscribe(data => this.requests.set(data)); }
 
   onSubmit() {
-    this.requestService.create(this.form).subscribe(() => { this.cancelForm(); this.load(); });
+    this.requestService.create({
+      title: this.formTitle, description: this.formDescription, priority: this.formPriority
+    }).subscribe(() => { this.cancelForm(); this.load(); });
   }
 
   approve(id: string) { this.requestService.approve(id).subscribe(() => this.load()); }
   reject(id: string) { this.requestService.reject(id, 'Rejected by admin').subscribe(() => this.load()); }
 
-  cancelForm() {
-    this.showForm.set(false);
-    this.form = { title: '', description: '', priority: 'Medium' };
-  }
+  cancelForm() { this.showForm.set(false); this.formTitle = ''; this.formDescription = ''; this.formPriority = 'Medium'; }
 }
