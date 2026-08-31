@@ -1,0 +1,14 @@
+global using Task = System.Threading.Tasks.Task;
+global using MedOps.Domain.Entities;
+global using MedOps.Domain.Enums;
+global using MedOps.Domain.ValueObjects;
+global using MedOps.Domain.Exceptions;
+global using MedOps.Domain.Interfaces;
+global using MedOps.Application.DTOs;
+global using MedOps.Application.Services;
+global using MedOps.Application.Interfaces;
+global using MedOps.Application.Validators;
+global using MedOps.Application.Behaviors;
+global using MediatR;
+global using FluentValidation;
+global using System.ComponentModel.DataAnnotations;

@@ -1,0 +1,43 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.nupkg
+.vs/
+*.DotSettings.user
+appsettings.Development.json
+launchSettings.json
+
+## Node
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+
+## IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+## OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+Logs/
+*.log
+
+## Secrets
+appsettings.*.json

@@ -1,0 +1,10 @@
+global using MedOps.Domain.Enums;
+global using MedOps.Domain.ValueObjects;
+global using MedOps.Domain.Interfaces;
+global using MedOps.Infrastructure.Data;
+global using MedOps.Infrastructure.Repositories;
+global using MedOps.Infrastructure.Services;
+global using MedOps.Infrastructure.Interfaces;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Serilog;

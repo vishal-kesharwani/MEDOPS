@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MedOps.Api/MedOps.Api.csproj" />
+    <Project Path="src/MedOps.Application/MedOps.Application.csproj" />
+    <Project Path="src/MedOps.Contracts/MedOps.Contracts.csproj" />
+    <Project Path="src/MedOps.Domain/MedOps.Domain.csproj" />
+    <Project Path="src/MedOps.Infrastructure/MedOps.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MedOps.ApiTests/MedOps.ApiTests.csproj" />
+    <Project Path="tests/MedOps.IntegrationTests/MedOps.IntegrationTests.csproj" />
+    <Project Path="tests/MedOps.UnitTests/MedOps.UnitTests.csproj" />
+  </Folder>
+</Solution>

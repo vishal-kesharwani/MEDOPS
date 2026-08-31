@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/.vs/
+**/.vscode/
+**/TestResults/
+**/.git
+**/docker-compose*.yml
+**/Dockerfile
+**/*.md
+.vs/
+frontend/medops-web/node_modules/
