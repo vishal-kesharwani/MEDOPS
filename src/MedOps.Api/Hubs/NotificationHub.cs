@@ -1,0 +1,38 @@
+namespace MedOps.Api.Hubs;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+
+[Authorize]
+public class NotificationHub : Hub
+{
+    public override async Task OnConnectedAsync()
+    {
+        var userId = Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+        }
+        await base.OnConnectedAsync();
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        var userId = Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
+        }
+        await base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task SendNotificationToUser(string userId, string title, string message, string type)
+    {
+        await Clients.Group($"user_{userId}").SendAsync("ReceiveNotification", new { title, message, type, createdAt = DateTime.UtcNow });
+    }
+
+    public async Task SendActivityUpdate(string action, string entityType, string? entityName)
+    {
+        await Clients.All.SendAsync("ReceiveActivityUpdate", new { action, entityType, entityName, timestamp = DateTime.UtcNow });
+    }
+}

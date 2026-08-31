@@ -6,6 +6,7 @@ using MedOps.Application.Services;
 using MedOps.Domain.Entities;
 using MedOps.Domain.Interfaces;
 using MedOps.Api.Middleware;
+using MedOps.Api.Services;
 using Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -102,6 +103,12 @@ builder.Services.AddScoped<ISiteService, SiteService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IRequestService, RequestService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IAuditService, MedOps.Infrastructure.Services.AuditService>();
+builder.Services.AddScoped<INotificationService, MedOps.Infrastructure.Services.NotificationService>();
+builder.Services.AddScoped<ICommentService, MedOps.Infrastructure.Services.CommentService>();
+builder.Services.AddScoped<IFileService, MedOps.Infrastructure.Services.FileService>();
+builder.Services.AddScoped<IDashboardService, MedOps.Infrastructure.Services.DashboardService>();
+builder.Services.AddScoped<MedOps.Infrastructure.Services.IActivityLogService, MedOps.Infrastructure.Services.ActivityLogService>();
 
 builder.Services.AddScoped<MedOps.Application.Validators.CreateStudyValidator>();
 builder.Services.AddScoped<MedOps.Application.Validators.UpdateStudyValidator>();
@@ -132,6 +139,9 @@ builder.Services.AddGraphQLServer()
     .AddSorting()
     .AddMutationType();
 
+builder.Services.AddSignalR();
+builder.Services.AddScoped<MedOps.Api.Services.INotificationHubService, MedOps.Api.Services.NotificationHubService>();
+
 builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddCors(options =>
@@ -144,6 +154,8 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+
+builder.Services.AddDirectoryBrowser();
 
 builder.Services.AddHealthChecks()
     .AddRedis(builder.Configuration.GetSection("Redis:ConnectionString").Value ?? string.Empty, name: "redis");
@@ -180,6 +192,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.MapControllers();
+
+app.MapHub<MedOps.Api.Hubs.NotificationHub>("/hubs/notifications");
 
 app.MapGraphQL();
 

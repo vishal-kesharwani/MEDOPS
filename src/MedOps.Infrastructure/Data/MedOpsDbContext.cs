@@ -15,6 +15,11 @@ public class MedOpsDbContext : IdentityDbContext<ApplicationUser, Microsoft.AspN
     public DbSet<TaskAssignment> TaskAssignments => Set<TaskAssignment>();
     public DbSet<Request> Requests => Set<Request>();
     public DbSet<RequestApproval> RequestApprovals => Set<RequestApproval>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Comment> Comments => Set<Comment>();
+    public DbSet<FileAttachment> FileAttachments => Set<FileAttachment>();
 
     public MedOpsDbContext(DbContextOptions<MedOpsDbContext> options) : base(options) { }
 
