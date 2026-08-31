@@ -6,11 +6,11 @@ Enterprise clinical trial management platform demonstrating modernization of a l
 
 | Dashboard | Studies Management |
 |-----------|-------------------|
-| ![Dashboard](screenshots/dashboard.png) | ![Studies](screenshots/studies.png) |
+| ![Dashboard](screenshots/dashboard.png) | ![Studies](screenshots/studiess.png) |
 
 | Sites Management | Tasks & Notifications |
 |------------------|----------------------|
-| ![Sites](screenshots/sites.png) | ![Tasks](screenshots/tasks.png) |
+| ![Sites](screenshots/sites.png) | ![Tasks](screenshots/Task.png) |
 
 | Requests | Departments |
 |----------|-------------|
@@ -18,7 +18,7 @@ Enterprise clinical trial management platform demonstrating modernization of a l
 
 | Audit Log |
 |-----------|
-| ![Audit Log](screenshots/audit.png) |
+| ![Audit Log](screenshots/auditlog.png) |
 
 ## Tech Stack
 
