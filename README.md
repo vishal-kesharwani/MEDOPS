@@ -6,7 +6,7 @@ Enterprise clinical trial management platform demonstrating modernization of a l
 
 | Dashboard | Studies Management |
 |-----------|-------------------|
-| ![Dashboard](screenshots/dashboard.png) | ![Studies](screenshots/studiess.png) |
+| ![Dashboard](screenshots/dashboard.png) | ![Studies](screenshots/studies.png) |
 
 | Sites Management | Tasks & Notifications |
 |------------------|----------------------|
