@@ -2,11 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface AddressDto {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipCode: string;
+}
+
+export interface ContactInfoDto {
+  email: string;
+  phone: string;
+}
+
 export interface SiteDto {
   id: string;
   name: string;
   description: string;
   status: string;
+  address: AddressDto;
+  contactInfo: ContactInfoDto;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -15,6 +30,8 @@ export interface SiteDto {
 export interface CreateSiteDto {
   name: string;
   description: string;
+  address: AddressDto;
+  contactInfo: ContactInfoDto;
 }
 
 @Injectable({ providedIn: 'root' })

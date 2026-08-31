@@ -6,6 +6,8 @@ export interface DepartmentDto {
   id: string;
   name: string;
   description: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateDepartmentDto {

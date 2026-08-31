@@ -18,7 +18,7 @@ export interface CreateTaskDto {
   title: string;
   description: string;
   assignedTo: string;
-  studyId?: string;
+  priority: string;
 }
 
 @Injectable({ providedIn: 'root' })

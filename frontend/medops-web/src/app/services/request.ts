@@ -7,13 +7,16 @@ export interface RequestDto {
   title: string;
   description: string;
   status: string;
-  createdBy: string;
+  priority: string;
+  requestedBy: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateRequestDto {
   title: string;
   description: string;
+  priority: string;
 }
 
 @Injectable({ providedIn: 'root' })
